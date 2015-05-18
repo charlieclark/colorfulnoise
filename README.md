@@ -6,3 +6,5 @@ Based on a stripped down and optimized version of [anomal/RainbowVis-JS](https:/
 and 
 
 Improved [perlin noise](http://zreference.com/canvas-perlin-noise/)
+
+Code written by [joeonmars](https://github.com/joeonmars) and slightly refactored by me 
