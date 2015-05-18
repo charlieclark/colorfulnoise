@@ -5,7 +5,7 @@
 	var Rainbow = require( "rainbow" );
 
 	var minSize = 5;
-	var maxSize = 400;
+	var maxSize = 200;
 
 	var minFrequency = 1 / 1000;
 	var maxFrequency = 1 / 30;
@@ -23,6 +23,8 @@
 		this._freq = minFrequency + ( options.granularity * ( maxFrequency - minFrequency ) );
 
 		this._speed = minSpeed + ( options.speed * ( maxSpeed - minSpeed ) );
+
+		this._animating = false;
 
 		this._z = 0;
 		this.init();
@@ -69,12 +71,25 @@
 
 		start: function() {
 
+			this._animating = true;
 			this.animate();
+		},
+
+		start: function() {
+
+			this._animating = false;
 		},
 
 		animate: function() {
 
-			requestAnimationFrame( this.animate.bind( this ) );
+			if ( this._animating ) {
+				requestAnimationFrame( this.animate.bind( this ) );
+				this.updateNoise();
+			}
+		},
+
+		update: function() {
+
 			this.updateNoise();
 		},
 
