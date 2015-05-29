@@ -15,8 +15,8 @@
 
 	function ColorfulNoise( options ) {
 
-		this._width = minSize + ( options.quality * ( maxSize - minSize ) );
-		this._height = this._width;
+		this._width = options.width || minSize + ( options.quality * ( maxSize - minSize ) );
+		this._height = options.height || this._width;
 
 		this._colors = options.colors || [ '#F970F8', '#F9FBB1', '#AAFEA3', '#94FEF7', '#F9FBB1', '#F970F8' ];
 
@@ -46,27 +46,32 @@
 
 		updateNoise: function() {
 
-			var rainbow = this._rainbow;
-			var canvas = this._canvas;
-			var context = this._ctx;
-			var freq = this._freq;
 			var z = ( this._z += this._speed );
-			var pix = context.createImageData( canvas.width, canvas.height );
-			var inc = 0;
-			for ( var y = 0; y < canvas.height; y++ ) {
-				for ( var x = 0; x < canvas.width; x++ ) {
-					var n = Noise( x * this._freq, y * this._freq, z ) + .5;
-					// console.log( n );
-					n = Math.min( Math.max( 0, n ), 1 );
+			var pix = this._ctx.createImageData( this._canvas.width, this._canvas.height );
 
-					var rgb = rainbow.colorAt( n, true );
+			var inc = 0,
+				x = 0,
+				y = 0,
+				n, rgb;
+
+			for ( y = 0; y < this._canvas.height; y++ ) {
+				for ( x = 0; x < this._canvas.width; x++ ) {
+					n = Noise( x * this._freq, y * this._freq, z ) + .5;
+
+					if ( n < 0 ) {
+						n = 0;
+					} else if ( n > 1 ) {
+						n = 1;
+					}
+
+					rgb = this._rainbow.colorAt( n, true );
 					pix.data[ inc++ ] = rgb[ 0 ];
 					pix.data[ inc++ ] = rgb[ 1 ];
 					pix.data[ inc++ ] = rgb[ 2 ];
 					pix.data[ inc++ ] = 255;
 				}
 			}
-			context.putImageData( pix, 0, 0 );
+			this._ctx.putImageData( pix, 0, 0 );
 		},
 
 		start: function() {
@@ -75,7 +80,7 @@
 			this.animate();
 		},
 
-		start: function() {
+		stop: function() {
 
 			this._animating = false;
 		},
