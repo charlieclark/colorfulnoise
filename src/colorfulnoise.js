@@ -164,6 +164,17 @@
 		getData: function() {
 
 			return this._colorData;
+		},
+
+		getColorAt: function( x, y ) {
+
+			var index = ( y * this._width + x ) * 3;
+
+			return [
+				this._colorData[ index ],
+				this._colorData[ index + 1 ],
+				this._colorData[ index + 2 ]
+			];
 		}
 	}
 
