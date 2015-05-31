@@ -13,6 +13,9 @@
 	var minSpeed = 0.001;
 	var maxSpeed = 0.1;
 
+	var fps = 1000 / 60;
+	var transitionTime = 5;
+
 	function ColorfulNoise( options ) {
 
 		this._width = options.width || minSize + ( options.quality * ( maxSize - minSize ) );
@@ -26,6 +29,10 @@
 
 		this._animating = false;
 
+		this._hasCanvas = options.hasCanvas;
+
+		this._colorData = [];
+
 		this._z = 0;
 		this.init();
 	}
@@ -34,28 +41,37 @@
 
 		init: function() {
 
-			var canvas = document.createElement( "canvas" );
-			var rainbow = new Rainbow( this._colors );
+			if ( this._hasCanvas ) {
+				this._canvas = document.createElement( "canvas" );
+				this._ctx = this._canvas.getContext( "2d" );
+			}
 
-			this._canvas = canvas;
-			this._ctx = canvas.getContext( "2d" );
-			this._rainbow = rainbow;
-
+			this._rainbow = new Rainbow( this._colors );
 			this.resize()
 		},
 
 		updateNoise: function() {
 
+			if ( this._toRainbow ) {
+				this.updateToRainbow();
+			}
+
 			var z = ( this._z += this._speed );
-			var pix = this._ctx.createImageData( this._canvas.width, this._canvas.height );
+
+			if ( this._hasCanvas ) {
+				var pix = this._ctx.createImageData( this._canvas.width, this._canvas.height );
+				var data = this._colorData = pix.data;
+			} else {
+				var data = this._colorData;
+			}
 
 			var inc = 0,
 				x = 0,
 				y = 0,
 				n, rgb;
 
-			for ( y = 0; y < this._canvas.height; y++ ) {
-				for ( x = 0; x < this._canvas.width; x++ ) {
+			for ( y = 0; y < this._height; y++ ) {
+				for ( x = 0; x < this._width; x++ ) {
 					n = Noise( x * this._freq, y * this._freq, z ) + .5;
 
 					if ( n < 0 ) {
@@ -65,13 +81,47 @@
 					}
 
 					rgb = this._rainbow.colorAt( n, true );
-					pix.data[ inc++ ] = rgb[ 0 ];
-					pix.data[ inc++ ] = rgb[ 1 ];
-					pix.data[ inc++ ] = rgb[ 2 ];
-					pix.data[ inc++ ] = 255;
+
+					if ( this._toRainbow ) {
+						rgb2 = this._toRainbow.colorAt( n, true );
+						rgb = this.blendColors( rgb, rgb2, this._toRainbowRatio );
+					}
+
+					data[ inc++ ] = rgb[ 0 ];
+					data[ inc++ ] = rgb[ 1 ];
+					data[ inc++ ] = rgb[ 2 ];
+					data[ inc++ ] = 255;
 				}
 			}
-			this._ctx.putImageData( pix, 0, 0 );
+
+			if ( this._hasCanvas ) {
+				this._ctx.putImageData( pix, 0, 0 );
+			}
+		},
+
+		blendColors: function( oldColor, newColor, ratio ) {
+
+			var r = oldColor[ 0 ] + ( newColor[ 0 ] - oldColor[ 0 ] ) * ratio;
+			var g = oldColor[ 1 ] + ( newColor[ 1 ] - oldColor[ 1 ] ) * ratio;
+			var b = oldColor[ 2 ] + ( newColor[ 2 ] - oldColor[ 2 ] ) * ratio;
+			return [ r, g, b ];
+		},
+
+		updateRainbow: function( colorArray ) {
+
+			this._ticker = 0;
+			this._toRainbow = new Rainbow( colorArray );
+		},
+
+		updateToRainbow: function() {
+
+			this._ticker++;
+			this._toRainbowRatio = ( this._ticker / ( transitionTime * fps ) );
+
+			if ( this._toRainbowRatio >= 1 ) {
+				this._rainbow = this._toRainbow;
+				this._toRainbow = null;
+			}
 		},
 
 		start: function() {
@@ -100,13 +150,20 @@
 
 		resize: function() {
 
-			this._canvas.width = this._width;
-			this._canvas.height = this._height;
+			if ( this._hasCanvas ) {
+				this._canvas.width = this._width;
+				this._canvas.height = this._height;
+			}
 		},
 
 		getCanvas: function() {
 
 			return this._canvas;
+		},
+
+		getData: function() {
+
+			return this._colorData;
 		}
 	}
 

@@ -18,11 +18,12 @@
 			console.log("!");
 		    var noise = new ColorfulNoise( {
 		    	// quality : 0.2,
-		    	width : 50,
-		    	height: 20,
-		    	granularity : 0.5,
-		    	speed : 0.5,
-		        colors : [ "#6DE1FF", "#D53CA0"]
+		    	width : 20,
+		    	height: 2,
+		    	granularity : 0.8,
+		    	speed : 0.1,
+		        colors : [ "#6DE1FF", "#D53CA0"],
+		        hasCanvas : false
 		    } );
 
 		    $( "body" ).append( noise.getCanvas() );
@@ -31,8 +32,9 @@
 		    	width: window.innerWidth,
 		    	height: window.innerHeight,
 		    });
-
+		    window.noise = noise;
 		    noise.start();
+
 		} );
 	</script>
 </body>
