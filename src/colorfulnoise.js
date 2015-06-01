@@ -14,7 +14,7 @@
 	var maxSpeed = 0.1;
 
 	var fps = 1000 / 60;
-	var transitionTime = 5;
+	var defaultTransitionTime = 5;
 
 	function ColorfulNoise( options ) {
 
@@ -107,8 +107,9 @@
 			return [ r, g, b ];
 		},
 
-		updateRainbow: function( colorArray ) {
+		updateRainbow: function( colorArray, transitionTime ) {
 
+			this._transitionTime = isNaN( transitionTime ) ? defaultTransitionTime : transitionTime;
 			this._ticker = 0;
 			this._toRainbow = new Rainbow( colorArray );
 		},
@@ -116,7 +117,7 @@
 		updateToRainbow: function() {
 
 			this._ticker++;
-			this._toRainbowRatio = ( this._ticker / ( transitionTime * fps ) );
+			this._toRainbowRatio = ( this._ticker / ( this._transitionTime * fps ) );
 
 			if ( this._toRainbowRatio >= 1 ) {
 				this._rainbow = this._toRainbow;
