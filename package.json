@@ -4,7 +4,7 @@
   "description": "",
   "main": "colorfulnoise.js",
   "bin": {
-    "colorfulnoise": "bundle.js"
+    "colorfulnoise": "bin/colorfulnoise.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
