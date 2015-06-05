@@ -16,10 +16,10 @@ var myBundle = null;
 
 gulp.task( 'user_scripts_min', [ 'browserify_nowatch' ], function() {
 
-	return gulp.src( paths.bin + config.fileName + '.js' )
+	return gulp.src( paths.dist + config.fileName + '.js' )
 		.pipe( uglify() )
 		.pipe( rename( config.fileName + '.min.js' ) )
-		.pipe( gulp.dest( paths.bin ) )
+		.pipe( gulp.dest( paths.dist ) )
 } );
 
 gulp.task( 'browserify_watch', function() {
@@ -64,6 +64,6 @@ function bundle( myBundle ) {
 				.pipe( notify( "your JS broke idiot! " + err ) );
 		} )
 		.pipe( source( config.fileName + '.js' ) )
-		.pipe( gulp.dest( paths.bin ) )
+		.pipe( gulp.dest( paths.dist ) )
 		.pipe( livereload() );
 };
